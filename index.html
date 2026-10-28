@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#121a24">
+<meta name="description" content="Ironhold: a fast, strategic tower defense game. Build towers, hold the line, survive 40 waves across three maps.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Ironhold Tower Defense</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" hidden>
+  <header id="hud">
+    <div class="stat" id="hud-gold" title="Gold"><span class="ic gold"></span><b>0</b></div>
+    <div class="stat" id="hud-lives" title="Lives"><span class="ic heart"></span><b>0</b></div>
+    <div class="stat" id="hud-wave" title="Wave"><span class="ic flag"></span><b>0</b></div>
+    <div class="spacer"></div>
+    <button class="hbtn" id="btn-speed" title="Game speed">1×</button>
+    <button class="hbtn" id="btn-pause" title="Pause">❚❚</button>
+  </header>
+  <main id="stage"><canvas id="c"></canvas></main>
+  <footer id="panel">
+    <div id="panel-left"></div>
+    <div id="panel-right">
+      <button id="btn-wave" class="big">Start wave</button>
+    </div>
+  </footer>
+</div>
+
+<section class="screen" id="screen-title">
+  <div class="card">
+    <h1>IRONHOLD</h1>
+    <p class="sub">Tower Defense</p>
+    <div id="map-list"></div>
+    <button id="btn-continue" class="big accent" hidden>Continue run</button>
+    <div class="row">
+      <button id="btn-sound" class="hbtn wide">Sound: On</button>
+      <button id="btn-howto" class="hbtn wide">How to play</button>
+    </div>
+    <p class="fine">© AugustInnovations LLC · <a href="privacy.html">Privacy</a></p>
+  </div>
+</section>
+
+<section class="screen" id="screen-howto" hidden>
+  <div class="card">
+    <h2>How to play</h2>
+    <ul class="help">
+      <li><b>Tap an empty tile</b> to build a tower. Towers can't be placed on the road or on rocks and trees.</li>
+      <li><b>Tap a tower</b> to upgrade it, sell it, or change what it targets.</li>
+      <li><b>Start the next wave early</b> to earn bonus gold. Every enemy that reaches the gate costs a life.</li>
+      <li><b>Flying enemies</b> can only be hit by Archer, Frost and Tesla towers.</li>
+      <li><b>Armored enemies</b> shrug off small hits. Use Cannons and Teslas against them.</li>
+      <li>Survive all <b>40 waves</b> to conquer a map, then keep going in Endless mode.</li>
+    </ul>
+    <button id="btn-howto-back" class="big">Back</button>
+  </div>
+</section>
+
+<section class="screen" id="screen-pause" hidden>
+  <div class="card">
+    <h2>Paused</h2>
+    <button id="btn-resume" class="big accent">Resume</button>
+    <button id="btn-restart" class="big">Restart map</button>
+    <button id="btn-quit" class="big">Main menu</button>
+  </div>
+</section>
+
+<section class="screen" id="screen-end" hidden>
+  <div class="card">
+    <h2 id="end-title">Victory</h2>
+    <div id="end-stars" class="stars"></div>
+    <p id="end-text"></p>
+    <button id="btn-endless" class="big accent" hidden>Continue (Endless)</button>
+    <button id="btn-retry" class="big">Play again</button>
+    <button id="btn-end-menu" class="big">Main menu</button>
+  </div>
+</section>
+
+<div id="toast" hidden></div>
+
+<script src="game.js"></script>
+</body>
+</html>

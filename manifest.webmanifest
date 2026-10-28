@@ -1,0 +1,21 @@
+{
+  "name": "Ironhold Tower Defense",
+  "short_name": "Ironhold",
+  "description": "Build towers, hold the line, survive 40 waves across three maps.",
+  "id": "/ironhold/",
+  "start_url": "/ironhold/",
+  "scope": "/ironhold/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#121a24",
+  "theme_color": "#121a24",
+  "categories": ["games", "strategy"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "icons/screenshot-portrait.png", "sizes": "720x1280", "type": "image/png", "form_factor": "narrow" }
+  ]
+}
