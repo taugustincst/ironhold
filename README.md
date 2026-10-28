@@ -1,7 +1,7 @@
 # Ironhold Tower Defense
 
 A complete, self-contained HTML5 tower defense game built for Google Play.
-Live at **https://taugustincst.github.io/ironhold/** (installable PWA, works offline).
+Live at **https://taugustincst.github.io/ironhold/** (installable PWA, works offline), deployed from this repository by GitHub Pages.
 
 ## Game
 
@@ -26,7 +26,7 @@ The config for Bubblewrap is in `android/twa-manifest.json`.
 
 ```bash
 npm i -g @bubblewrap/cli
-cd ironhold/android
+cd android
 bubblewrap init --manifest https://taugustincst.github.io/ironhold/manifest.webmanifest
 ```
 
@@ -37,7 +37,7 @@ Keep the keystore and its passwords safe and out of git (`android/.gitignore` al
 ### 2. Build the app bundle
 
 ```bash
-cd ironhold/android
+cd android
 bubblewrap build
 ```
 
@@ -50,7 +50,7 @@ Chrome only hides its URL bar if the site vouches for the app. After you upload 
 
 1. Play Console → your app → **Setup → App signing** → copy the **SHA-256 certificate fingerprint** under *App signing key certificate*.
 2. Also copy the fingerprint of your *upload key* (`keytool -list -v -keystore android.keystore`), so sideloaded test builds are trusted too.
-3. Add a second object to `/.well-known/assetlinks.json` next to the Elderon entry:
+3. Add a second object to `/.well-known/assetlinks.json` in the `taugustincst.github.io` site repo, next to the Elderon entry:
 
 ```json
 {"relation":["delegate_permission/common.handle_all_urls"],
@@ -78,9 +78,8 @@ You only need a new Android build (bump `appVersionCode` and `appVersionName` in
 
 ## Local development
 
-Any static server works:
-
 ```bash
-python3 -m http.server 8000
-# open http://localhost:8000/ironhold/
+npm install     # playwright, for the smoke test only
+npm run serve   # http://localhost:8777/ironhold/
+npm test        # headless end-to-end check
 ```
