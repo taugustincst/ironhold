@@ -154,9 +154,41 @@ const Sfx = {
 
 /* ================= SAVE ================= */
 const SAVE_KEY = 'ironhold.v1';
-let profile = { best: {}, sound: true, run: null, seenHelp: false };
-function loadProfile() { try { const p = JSON.parse(localStorage.getItem(SAVE_KEY)); if (p && typeof p === 'object') profile = Object.assign(profile, p); } catch (e) { } Sfx.on = profile.sound !== false; }
-function saveProfile() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch (e) { } }
+let profile = { v: 2, best: {}, sound: true, run: null, seenHelp: false };
+function saneNum(v, lo, hi, dflt) { const n = Number(v); return Number.isFinite(n) ? Math.round(clamp(n, lo, hi)) : dflt; }
+function sanitizeBest(best) {
+  const out = {};
+  if (best && typeof best === 'object') for (const k of Object.keys(best)) {
+    const b = best[k]; if (!b || typeof b !== 'object') continue;
+    out[k] = { wave: saneNum(b.wave, 0, 9999, 0), stars: saneNum(b.stars, 0, 3, 0), won: b.won === true };
+  }
+  return out;
+}
+function sanitizeRun(run) {
+  try {
+    if (!run || typeof run !== 'object') return null;
+    if (!Number.isInteger(run.mapIdx) || run.mapIdx < 0 || run.mapIdx >= MAP_DEFS.length) return null;
+    if (!Array.isArray(run.towers)) return null;
+    const def = MAP_DEFS[run.mapIdx], seen = new Set(), towers = [];
+    for (const t of run.towers) {
+      if (!t || typeof t !== 'object' || !TOWER_DEFS[t.t]) continue;
+      if (!Number.isInteger(t.c) || !Number.isInteger(t.r)) continue;
+      if (t.c < 0 || t.r < 0 || t.c >= def.cols || t.r >= def.rows) continue;
+      const key = t.c + ',' + t.r; if (seen.has(key)) continue; seen.add(key);
+      towers.push({ t: t.t, c: t.c, r: t.r, l: saneNum(t.l, 0, TOWER_DEFS[t.t].lv.length - 1, 0), m: TARGET_MODES.includes(t.m) ? t.m : 'first' });
+    }
+    return { mapIdx: run.mapIdx, wave: saneNum(run.wave, 0, 100000, 0), gold: saneNum(run.gold, 0, 10000000, 0), lives: saneNum(run.lives, 0, 999, 0),
+      endless: !!run.endless, kills: saneNum(run.kills, 0, Number.MAX_SAFE_INTEGER, 0), towers };
+  } catch (e) { return null; }
+}
+function loadProfile() {
+  try {
+    const p = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (p && typeof p === 'object') profile = { v: 2, best: sanitizeBest(p.best), sound: typeof p.sound === 'boolean' ? p.sound : true, run: sanitizeRun(p.run), seenHelp: p.seenHelp === true };
+  } catch (e) { }
+  Sfx.on = profile.sound !== false;
+}
+function saveProfile() { try { profile.v = 2; localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch (e) { } }
 
 /* ================= GAME STATE ================= */
 const canvas = $('#c'), ctx = canvas.getContext('2d');
@@ -174,9 +206,15 @@ function newGame(mapIdx, run) {
     shake: 0, won: false,
   };
   if (run) {
-    G.wave = run.wave; G.gold = run.gold; G.lives = run.lives; G.endless = !!run.endless; G.kills = run.kills || 0;
-    for (const t of run.towers) { if (TOWER_DEFS[t.t]) addTower(t.t, t.c, t.r, t.l, t.m, true); }
-    G.phase = 'ready';
+    try {
+      G.wave = run.wave; G.gold = run.gold; G.lives = run.lives; G.endless = !!run.endless; G.kills = run.kills || 0;
+      for (const t of run.towers) { if (TOWER_DEFS[t.t]) addTower(t.t, t.c, t.r, t.l, t.m, true); }
+      G.phase = 'ready';
+    } catch (e) {
+      clearRun();
+      G.map = compileMap(MAP_DEFS[mapIdx]); G.towers = [];
+      G.wave = 0; G.gold = map.gold; G.lives = map.lives; G.endless = false; G.kills = 0; G.phase = 'ready';
+    }
   }
   buildBackground();
   hudCache = { gold: null, lives: null, wave: null, speed: null, panel: '' };
@@ -337,7 +375,7 @@ function updateProjs(dt) {
       if (p.tgt && !p.tgt.dead) {
         hitEnemy(p.tgt, p.dmg, p.src);
         if (p.kind === 'frost') {
-          const apply = e => { if (p.slow > e.slow || e.slowT < 0.3) { e.slow = p.slow; } e.slowT = Math.max(e.slowT, p.slowT); };
+          const apply = e => { const s = e.boss ? p.slow * 0.35 : p.slow; if (s > e.slow || e.slowT <= 0) { e.slow = s; } e.slowT = Math.max(e.slowT, p.slowT); };
           apply(p.tgt); if (p.splash) for (const e of G.enemies) if (!e.dead && e !== p.tgt && dist(p.tx, p.ty, e.x, e.y) <= p.splash) apply(e);
           puff(p.tx, p.ty, '#bfefff', 6);
         } else puff(p.tx, p.ty, '#fff', 3);
