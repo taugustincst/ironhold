@@ -31,6 +31,10 @@ SEVEN KINDS OF TROUBLE
 • 7 enemy types, including flying units your ground plan can't ignore and armored units that shrug off light fire
 • Call the next wave early for a bonus, and run the fight at 1×, 2× or 3× speed
 
+STILL GROWING — YOUR REVIEWS SHAPE THE GAME
+• Ironhold is dynamically developed: it keeps evolving after release, with new content and balance changes driven by what players ask for
+• Reviews inspire new functionality — want a tower, a map, a mode? Leave a review and make your case
+
 NO ADS. NO PURCHASES. NOTHING COLLECTED.
 • No ads, no in-app purchases, no accounts, no analytics
 • No network calls during gameplay — the game downloads once, then plays offline
