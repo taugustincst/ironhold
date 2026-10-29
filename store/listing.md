@@ -4,14 +4,14 @@
 
 **App name** (30 chars max): `Ironhold Tower Defense` (22 chars)
 
-**Short description** (80 chars max, 77 chars):
-`Tower defense with 3 maps, 120 waves and 5 upgradable towers. No ads, no IAP.`
+**Short description** (80 chars max, 75 chars):
+`Offline tower defense: 120 waves, 3 maps, 5 towers, bosses. No ads, no IAP.`
 
 **Full description**:
 
-The road is open, the horde is coming, and the hold is yours to defend.
-
 Ironhold is a complete tower defense game: place towers along the road, upgrade them as the waves grow stronger, and don't let anything reach the gate. No ads interrupt a run, nothing is sold inside the game, and your progress never leaves your device.
+
+The road is open, the horde is coming, and the hold is yours to defend.
 
 THREE MAPS, 120 WAVES
 • Greenfield Pass, Frostvale Fork — where two roads converge — and the Ashlands Gauntlet, unlocked one after another as you win
@@ -39,6 +39,7 @@ NO ADS. NO PURCHASES. NOTHING COLLECTED.
 • No ads, no in-app purchases, no accounts, no analytics
 • No network calls during gameplay — the game downloads once, then plays offline
 • Progress, stars and in-progress runs are saved on this device only
+• The browser edition is free to play on our website — this app is for offline play, your home screen, and supporting development
 
 Made by AugustInnovations LLC.
 
