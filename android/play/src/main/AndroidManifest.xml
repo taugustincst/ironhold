@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:manageSpaceActivity="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
         android:theme="@android:style/Theme.Translucent.NoTitleBar">
 
         <!-- Which site this app vouches for; the site's
@@ -82,6 +83,19 @@
         </activity>
 
         <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity" />
+
+        <!-- The library's launcher switches this component on or off for the
+             browser's site settings, and throws if the manifest does not
+             declare it: the first build of this module crashed at launch on
+             an emulator with "Component class ...ManageDataLauncherActivity
+             does not exist". Bubblewrap declares it the same way. -->
+        <activity
+            android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.customtabs.trusted.MANAGE_SPACE_URL"
+                android:value="@string/launchUrl" />
+        </activity>
 
         <!-- The fallback above: the game in a WebView inside the app. -->
         <activity
