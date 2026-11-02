@@ -18,31 +18,62 @@ Tuning lives at the top of `game.js` (`MAP_DEFS`, `TOWER_DEFS`, `ENEMY_DEFS`, `b
 
 ## Publishing to Google Play
 
-This game ships as a **Trusted Web Activity (TWA)**: a tiny Android app that opens the
-PWA full-screen in Chrome, exactly like the existing Elderon app on this site.
-The config for Bubblewrap is in `android/twa-manifest.json`.
+This game ships as a **Trusted Web Activity (TWA)**: a small Android app that opens the
+PWA full-screen in Chrome (or in its own WebView on a phone without a TWA-capable browser).
+The Android project is in `android/` (module `android/play`), package `com.taugustincst.ironhold`.
 
-### 1. One-time setup
+The first upload was a wrapper generated outside this repository, and Play rejected it on
+1 Nov 2026 under Broken Functionality ("The app opens, but it keeps crashing"). That wrapper
+is replaced by `android/play`, which is built, checked and launched on an emulator by
+`.github/workflows/android.yml` on every change. Its manifest names no `Application` class:
+the same kind of generated wrapper got Chronicles of Elderon rejected the same day because it
+named one its dex did not contain. Do not go back to `bubblewrap build` or PWABuilder output.
 
-```bash
-npm i -g @bubblewrap/cli
-cd android
-bubblewrap init --manifest https://taugustincst.github.io/ironhold/manifest.webmanifest
+### 1. The upload key
+
+Play only accepts bundles signed with the key that signed the listing's first upload. That
+keystore came with whichever tool built the first bundle (Bubblewrap writes `android.keystore`;
+PWABuilder's download has `signing.keystore` and `signing-key-info.txt`). Use that one; do not
+make a new one. If it is lost, request an upload key reset in Play Console → Setup → App signing.
+
+Either put it in the repository's Actions secrets (`ANDROID_UPLOAD_KEYSTORE` as base64,
+`ANDROID_UPLOAD_STORE_PASSWORD`, `ANDROID_UPLOAD_KEY_ALIAS`, `ANDROID_UPLOAD_KEY_PASSWORD`),
+or create `android/keystore.properties` locally (ignored by git, never commit it):
+
+```properties
+storeFile=/path/to/the/upload.keystore
+storePassword=...
+keyAlias=...
+keyPassword=...
 ```
-
-Bubblewrap will install a JDK and Android SDK on first run, read the values in
-`twa-manifest.json`, and create a signing keystore (`android.keystore`) if one does not exist.
-Keep the keystore and its passwords safe and out of git (`android/.gitignore` already excludes it).
 
 ### 2. Build the app bundle
 
+**On GitHub:** Actions → *Release (Play bundle)* → Run workflow with version `1.0.1`. With the
+secrets set, it builds, checks and attaches `ironhold-1.0.1-play.aab` (versionCode 10001) to a
+release tagged `play-v1.0.1`.
+
+**Or locally** (Android SDK with platform 36, JDK 17+):
+
 ```bash
 cd android
-bubblewrap build
+./gradlew :play:bundleRelease :play:assembleRelease -PversionCode=10001 -PversionName=1.0.1
+node ../tools/check-apk.js play/build/outputs/apk/release/play-release.apk --package com.taugustincst.ironhold
+# upload play/build/outputs/bundle/release/play-release.aab
 ```
 
-This produces `app-release-bundle.aab` (upload this) and `app-release-signed.apk` (for local testing:
-`adb install app-release-signed.apk`).
+Every upload needs a higher `versionCode` than any earlier one; 10001 is above the rejected
+upload's. To try it on a phone first: `adb install play/build/outputs/apk/release/play-release.apk`.
+
+### Resubmitting after the 1 Nov 2026 rejection
+
+1. Merge the fix, then build the signed bundle (step 2).
+2. Play Console → Ironhold → Test and release → create a new release on the track the rejected
+   one was on, upload the new `.aab`, and add a release note.
+3. Optional but worth it: before sending for review, check the pre-launch report for that
+   release shows no crashes.
+4. Publishing overview → Send changes for review. No appeal is needed: the notice says a fixed
+   version resubmitted for review is the way back.
 
 ### 3. Digital Asset Links (removes the browser bar)
 
@@ -67,14 +98,14 @@ Chrome only hides its URL bar if the site vouches for the app. After you upload 
 - **Data safety form**: "No data collected", "No data shared". Local save data never leaves the device.
 - **Ads**: declare "No ads".
 - **Store assets**: 512×512 icon (`icons/icon-512.png`), 1024×500 feature graphic, and at least 2 phone screenshots (take them from the live site on a phone or with Chrome DevTools device mode).
-- **Target API level**: Bubblewrap keeps `targetSdk` current with Play's yearly requirement; re-run `bubblewrap update` before each release.
+- **Target API level**: `android/play/build.gradle` targets API 36; raise `compileSdk`/`targetSdk` when Play's yearly requirement moves.
 - **Pricing**: set the app as paid at upload time if you want to charge up front. A Play app cannot change from free to paid later, so decide before publishing.
 
 ### 5. Releasing updates
 
 Game updates are just pushes to this repo: the service worker (`sw.js`) picks up new files on the next launch.
 Bump `VERSION` in `sw.js` whenever you change game files so cached players get the update.
-You only need a new Android build (bump `appVersionCode` and `appVersionName` in `twa-manifest.json`, then `bubblewrap build`) when the wrapper itself changes or Play requires a newer target SDK.
+You only need a new Android build (run the Release workflow with a higher version) when the wrapper itself changes or Play requires a newer target SDK.
 
 ## Local development
 

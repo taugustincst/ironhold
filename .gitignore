@@ -3,7 +3,10 @@ android/*.keystore
 android/*.jks
 android/*.aab
 android/*.apk
-android/app/
-android/gradle/
 android/build/
 android/.gradle/
+android/play/build/
+android/local.properties
+android/keystore.properties
+android/.idea/
+android/*.iml

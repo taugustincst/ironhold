@@ -1,0 +1,100 @@
+plugins {
+    id 'com.android.application'
+}
+
+// The Google Play edition of Ironhold: a Trusted Web Activity. Chrome opens
+// the game's own site full screen (no URL bar once the site's asset links
+// name this app's signing key); on a phone without a TWA-capable browser the
+// app shows the site in its own WebView instead, so it opens either way.
+//
+// This project replaces the Bubblewrap/PWABuilder-generated wrapper that
+// Play rejected on 1 Nov 2026 for crashing at launch. That generated project
+// was never in this repository; this one is, it is built by CI, and every
+// APK it builds is checked by tools/check-apk.js. It is the same shape as the
+// generated one (android-browser-helper's launcher activity, splash screen
+// and delegation service) with nothing generated left to go missing. In
+// particular there is no Application class: the same kind of generated
+// wrapper got Chronicles of Elderon rejected the same day because its
+// manifest named an Application class that was not in the dex.
+
+// The site the app opens. GitHub Pages serves this repository at
+// https://taugustincst.github.io/ironhold/, and the asset links that vouch for
+// this app live at https://taugustincst.github.io/.well-known/assetlinks.json.
+def playHost = (project.hasProperty('playHost') ? project.property('playHost') : 'taugustincst.github.io').toString()
+def playPath = (project.hasProperty('playPath') ? project.property('playPath') : '/ironhold/').toString()
+def launchUrl = "https://${playHost}${playPath}"
+def pathPrefix = playPath.replaceAll('/+$', '') ?: '/'
+
+// Release signing: the upload key from android/keystore.properties when it
+// exists (never committed), the debug key otherwise. Play only takes a
+// bundle signed with the listing's upload key.
+def keystoreFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystoreFile.exists()) {
+    keystoreFile.withInputStream { keystoreProps.load(it) }
+}
+
+// Every Play upload needs a higher versionCode than any earlier one. The
+// release workflow derives it from the version (1.0.1 -> 10001), which is
+// above anything a generator numbered from 1.
+def relVersionCode = (project.hasProperty('versionCode') ? project.property('versionCode') : '10001').toString().toInteger()
+def relVersionName = (project.hasProperty('versionName') ? project.property('versionName') : '1.0.1').toString()
+
+android {
+    // The package name is the app's identity on Google Play: the listing was
+    // created under it, and Play never lets it change.
+    namespace 'com.taugustincst.ironhold'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.taugustincst.ironhold'
+        minSdk 24
+        targetSdk 36
+        versionCode relVersionCode
+        versionName relVersionName
+
+        resValue 'string', 'launchUrl', launchUrl
+        resValue 'string', 'hostName', playHost
+        resValue 'string', 'webManifestUrl', launchUrl + 'manifest.webmanifest'
+        resValue 'string', 'providerAuthority', 'com.taugustincst.ironhold.fileprovider'
+        resValue 'integer', 'splashScreenFadeOutDuration', '300'
+        // The app's side of the asset-links handshake: it names the site,
+        // the site's assetlinks.json names the app and its key.
+        resValue 'string', 'assetStatements',
+            '[{\\"relation\\": [\\"delegate_permission/common.handle_all_urls\\"], ' +
+            '\\"target\\": {\\"namespace\\": \\"web\\", \\"site\\": \\"https://' + playHost + '\\"}}]'
+        manifestPlaceholders = [pathPrefix: pathPrefix]
+    }
+
+    signingConfigs {
+        if (keystoreFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // Nothing worth shrinking, and shrinking is one more way for a
+            // class the manifest names to go missing from the dex.
+            minifyEnabled false
+            signingConfig keystoreFile.exists() ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // The Trusted Web Activity launcher, splash screen, WebView fallback and
+    // delegation service. The version Bubblewrap generates with.
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.4'
+    implementation 'androidx.core:core:1.16.0'
+}
