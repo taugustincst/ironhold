@@ -130,13 +130,16 @@ function main() {
     // links to must be in the assets, or the page loads with holes in it. A
     // Trusted Web Activity carries no page: it opens the site.
     const entries = new Set(run('unzip', ['-Z1', apk]).split('\n').filter(Boolean));
-    if (entries.has('assets/index.html')) {
-      const wanted = ['assets/index.html'];
-      const html = run('unzip', ['-p', apk, 'assets/index.html']);
+    // The page sits at assets/index.html, or under assets/www/ where the
+    // app serves its files from a www/ folder.
+    const root = entries.has('assets/www/index.html') ? 'assets/www/' : 'assets/';
+    if (entries.has(root + 'index.html')) {
+      const wanted = [root + 'index.html'];
+      const html = run('unzip', ['-p', apk, root + 'index.html']);
       for (const m of html.matchAll(/<(?:script|link)\b[^>]*\b(?:src|href)="([^"#?]+)"/g)) {
         const ref = m[1];
         if (/^(?:https?:|data:|\/\/)/.test(ref) || ref === 'sw.js') continue; // sw.js is left out on purpose
-        wanted.push('assets/' + ref.replace(/^\.\//, ''));
+        wanted.push(root + ref.replace(/^\.\//, ''));
       }
       let present = 0;
       for (const w of wanted) {
