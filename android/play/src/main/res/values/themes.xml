@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Full screen from the first frame, in the game's own background colour. -->
+    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@color/ironhold_night</item>
+        <item name="android:statusBarColor">@color/ironhold_night</item>
+        <item name="android:navigationBarColor">@color/ironhold_night</item>
+    </style>
+</resources>

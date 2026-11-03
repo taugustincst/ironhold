@@ -37,9 +37,8 @@ STILL GROWING — YOUR REVIEWS SHAPE THE GAME
 
 NO ADS. NO PURCHASES. NOTHING COLLECTED.
 • No ads, no in-app purchases, no accounts, no analytics
-• No network calls during gameplay — the game downloads once, then plays offline
+• No network calls: the whole game is inside the app and plays fully offline
 • Progress, stars and in-progress runs are saved on this device only
-• The browser edition is free to play on our website — this app is for offline play, your home screen, and supporting development
 
 Made by AugustInnovations LLC.
 

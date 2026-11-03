@@ -1,13 +1,15 @@
 name: Android
-# The Play edition (android/play): build it, check every class the manifest
-# names is in the dex, and open it on an emulator to see that it does not
-# crash. Play rejected the earlier, generated wrapper on 1 Nov 2026 for
-# crashing at launch; a red run here is a build that must not be uploaded.
+# The Play edition (android/play), which carries the whole game inside the
+# APK: build it, check every class the manifest names and every file the
+# game's page loads is in it, and open it on an emulator to see that the game
+# loads with no script errors. A red run here is a build that must not be
+# uploaded. The game's own files are in the paths below because they ship
+# inside the app.
 on:
   push:
-    paths: ['android/**', 'tools/check-apk.js', 'tools/launch-test.sh', '.github/workflows/android.yml']
+    paths: ['android/**', 'index.html', 'game.js', 'style.css', 'icons/**', 'manifest.webmanifest', 'privacy.html', 'tools/check-apk.js', 'tools/launch-test.sh', '.github/workflows/android.yml']
   pull_request:
-    paths: ['android/**', 'tools/check-apk.js', 'tools/launch-test.sh', '.github/workflows/android.yml']
+    paths: ['android/**', 'index.html', 'game.js', 'style.css', 'icons/**', 'manifest.webmanifest', 'privacy.html', 'tools/check-apk.js', 'tools/launch-test.sh', '.github/workflows/android.yml']
   workflow_dispatch:
 permissions:
   contents: read

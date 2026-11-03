@@ -2,31 +2,21 @@ plugins {
     id 'com.android.application'
 }
 
-// The Google Play edition of Ironhold: a Trusted Web Activity. Chrome opens
-// the game's own site full screen (no URL bar once the site's asset links
-// name this app's signing key); on a phone without a TWA-capable browser the
-// app shows the site in its own WebView instead, so it opens either way.
+// The Google Play edition of Ironhold: a paid download with the whole game
+// inside it. A single full-screen WebView plays the game from the app's own
+// assets: WebViewAssetLoader serves assets/www over a synthetic https origin
+// (appassets.androidplatform.net), so localStorage keeps progress between
+// launches like it would on a secure site. The app asks for no permission,
+// not even INTERNET: the game makes no network requests, there is no
+// purchase inside it, and the website no longer hosts the playable game.
 //
-// This project replaces the Bubblewrap/PWABuilder-generated wrapper that
-// Play rejected on 1 Nov 2026 for crashing at launch. That generated project
-// was never in this repository; this one is, it is built by CI, and every
-// APK it builds is checked by tools/check-apk.js. It is the same shape as the
-// generated one (android-browser-helper's launcher activity, splash screen
-// and delegation service) with nothing generated left to go missing. In
-// particular there is no Application class: the same kind of generated
-// wrapper got Chronicles of Elderon rejected the same day because its
-// manifest named an Application class that was not in the dex.
-
-// The site the app opens. GitHub Pages serves this repository at
-// https://taugustincst.github.io/ironhold/, and the asset links that vouch for
-// this app live at https://taugustincst.github.io/.well-known/assetlinks.json.
-def playHost = (project.hasProperty('playHost') ? project.property('playHost') : 'taugustincst.github.io').toString()
-def playPath = (project.hasProperty('playPath') ? project.property('playPath') : '/ironhold/').toString()
-def launchUrl = "https://${playHost}${playPath}"
-def pathPrefix = playPath.replaceAll('/+$', '') ?: '/'
+// The same shape as Bubble Pop's Play edition. tools/check-apk.js checks
+// every APK built here, and the Android workflow opens it on an emulator and
+// fails unless the game's page actually loads.
 
 // Release signing: the upload key from android/keystore.properties when it
-// exists (never committed), the debug key otherwise. Play only takes a
+// exists (never committed; the Release workflow writes it from the repo's
+// ANDROID_UPLOAD_* secrets), the debug key otherwise. Play only takes a
 // bundle signed with the listing's upload key.
 def keystoreFile = rootProject.file('keystore.properties')
 def keystoreProps = new Properties()
@@ -35,13 +25,26 @@ if (keystoreFile.exists()) {
 }
 
 // Every Play upload needs a higher versionCode than any earlier one. The
-// release workflow derives it from the version (1.0.1 -> 10001), which is
-// above anything a generator numbered from 1.
-def relVersionCode = (project.hasProperty('versionCode') ? project.property('versionCode') : '10001').toString().toInteger()
-def relVersionName = (project.hasProperty('versionName') ? project.property('versionName') : '1.0.1').toString()
+// release workflow derives it from the version (1.0.0 -> 10000).
+def relVersionCode = (project.hasProperty('versionCode') ? project.property('versionCode') : '10100').toString().toInteger()
+def relVersionName = (project.hasProperty('versionName') ? project.property('versionName') : '1.1.0').toString()
+
+// The game's files live at the repository root. They are copied into the
+// app's assets as assets/www/... at build time, so the app can never drift
+// from the game's source and no second copy is checked in. sw.js stays out:
+// the files are already local, and a service worker has nothing to do.
+def webRoot = rootProject.file('..')
+def genAssetsDir = new File(buildDir, 'generated/webAssets')
+tasks.register('syncWebAssets', Copy) {
+    from(webRoot) {
+        include 'index.html', 'manifest.webmanifest', 'privacy.html', '*.css', 'css/**', 'js/**', 'icons/**', 'fonts/**', 'img/**', 'audio/**', 'sound/**', 'game.js'
+        exclude 'android/**', 'node_modules/**', 'tests/**', 'tools/**', 'store/**', 'site/**'
+    }
+    into(new File(genAssetsDir, 'www'))
+}
 
 android {
-    // The package name is the app's identity on Google Play: the listing was
+    // The package name is the app's identity on Google Play: the listing is
     // created under it, and Play never lets it change.
     namespace 'com.taugustincst.ironhold'
     compileSdk 36
@@ -52,18 +55,6 @@ android {
         targetSdk 36
         versionCode relVersionCode
         versionName relVersionName
-
-        resValue 'string', 'launchUrl', launchUrl
-        resValue 'string', 'hostName', playHost
-        resValue 'string', 'webManifestUrl', launchUrl + 'manifest.webmanifest'
-        resValue 'string', 'providerAuthority', 'com.taugustincst.ironhold.fileprovider'
-        resValue 'integer', 'splashScreenFadeOutDuration', '300'
-        // The app's side of the asset-links handshake: it names the site,
-        // the site's assetlinks.json names the app and its key.
-        resValue 'string', 'assetStatements',
-            '[{\\"relation\\": [\\"delegate_permission/common.handle_all_urls\\"], ' +
-            '\\"target\\": {\\"namespace\\": \\"web\\", \\"site\\": \\"https://' + playHost + '\\"}}]'
-        manifestPlaceholders = [pathPrefix: pathPrefix]
     }
 
     signingConfigs {
@@ -82,6 +73,7 @@ android {
             // Nothing worth shrinking, and shrinking is one more way for a
             // class the manifest names to go missing from the dex.
             minifyEnabled false
+            shrinkResources false
             signingConfig keystoreFile.exists() ? signingConfigs.release : signingConfigs.debug
         }
     }
@@ -90,11 +82,19 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
+    sourceSets {
+        main {
+            assets.srcDirs += genAssetsDir
+        }
+    }
 }
 
+tasks.named('preBuild') { dependsOn 'syncWebAssets' }
+
 dependencies {
-    // The Trusted Web Activity launcher, splash screen, WebView fallback and
-    // delegation service. The version Bubblewrap generates with.
-    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.4'
+    implementation 'androidx.webkit:webkit:1.12.1'
+    // WindowCompat and WindowInsetsControllerCompat: full screen on every
+    // Android the app supports (the platform's own controller is API 30+).
     implementation 'androidx.core:core:1.16.0'
 }
