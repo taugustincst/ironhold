@@ -43,6 +43,7 @@
       <button id="btn-sound" class="hbtn wide">Sound: On</button>
       <button id="btn-howto" class="hbtn wide">How to play</button>
     </div>
+    <button id="btn-more" class="hbtn wide more-btn" hidden>More games</button>
     <p class="fine">© AugustInnovations LLC · <a href="privacy.html">Privacy</a></p>
   </div>
 </section>
@@ -59,6 +60,15 @@
       <li>Survive all <b>40 waves</b> to conquer a map, then keep going in Endless mode.</li>
     </ul>
     <button id="btn-howto-back" class="big">Back</button>
+  </div>
+</section>
+
+<section class="screen" id="screen-more" hidden>
+  <div class="card">
+    <h2>More from AugustInnovations</h2>
+    <p class="fine">Our other games. Tap one to see it on Google Play.</p>
+    <ul class="more-list" id="more-list"></ul>
+    <button id="btn-more-back" class="big">Back</button>
   </div>
 </section>
 
@@ -84,6 +94,7 @@
 
 <div id="toast" hidden></div>
 
+<script src="js/more.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

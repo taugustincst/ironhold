@@ -26,8 +26,8 @@ if (keystoreFile.exists()) {
 
 // Every Play upload needs a higher versionCode than any earlier one. The
 // release workflow derives it from the version (1.0.0 -> 10000).
-def relVersionCode = (project.hasProperty('versionCode') ? project.property('versionCode') : '10100').toString().toInteger()
-def relVersionName = (project.hasProperty('versionName') ? project.property('versionName') : '1.1.0').toString()
+def relVersionCode = (project.hasProperty('versionCode') ? project.property('versionCode') : '10101').toString().toInteger()
+def relVersionName = (project.hasProperty('versionName') ? project.property('versionName') : '1.1.1').toString()
 
 // The game's files live at the repository root. They are copied into the
 // app's assets as assets/www/... at build time, so the app can never drift

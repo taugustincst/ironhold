@@ -662,6 +662,10 @@ $('#btn-endless').addEventListener('click', () => { G.endless = true; G.phase = 
 $('#btn-continue').addEventListener('click', () => { const r = profile.run; if (!r || !MAP_DEFS[r.mapIdx]) return; Sfx.init(); newGame(r.mapIdx, r); enterGame(); });
 $('#btn-howto').addEventListener('click', () => showScreen('howto'));
 $('#btn-howto-back').addEventListener('click', () => showScreen('title'));
+// More from AugustInnovations: reached from the title screen only, never during a run.
+$('#btn-more').hidden = !(window.MoreGames && window.MoreGames.render($('#more-list'), 'ironhold'));
+$('#btn-more').addEventListener('click', () => showScreen('more'));
+$('#btn-more-back').addEventListener('click', () => showScreen('title'));
 $('#btn-sound').addEventListener('click', () => { Sfx.on = !Sfx.on; profile.sound = Sfx.on; saveProfile(); $('#btn-sound').textContent = 'Sound: ' + (Sfx.on ? 'On' : 'Off'); Sfx.init(); Sfx.play('tap'); });
 window.addEventListener('resize', resize);
 document.addEventListener('visibilitychange', () => { if (document.hidden && G && screen === 'game' && G.phase !== 'over') pauseGame(); });
