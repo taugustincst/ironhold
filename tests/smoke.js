@@ -10,6 +10,12 @@ const check = (name, ok, extra = '') => { console.log((ok ? 'PASS ' : 'FAIL ') +
   p.on('response', r => { if (r.status() >= 400) errs.push(r.status() + ' ' + r.url()); });
   await p.goto(base); await p.waitForTimeout(500);
   check('title screen lists maps', (await p.locator('.mapbtn').count()) === 3);
+  check('the title screen offers More games', await p.isVisible('#btn-more'));
+  await p.click('#btn-more'); await p.waitForSelector('#screen-more:not([hidden])');
+  { const rows = await p.$$eval('#more-list a', as => as.map(a => ({ href: a.href, t: a.textContent }))); check('More games lists the other live games with a Play link each', rows.length >= 2 && rows.every(r => r.href.startsWith('https://play.google.com/store/apps/details?id=com.taugustincst.') && !r.href.endsWith('.ironhold') && !/[$£€]/.test(r.t)), JSON.stringify(rows.map(r => r.href.split('.').pop()))); }
+  check('every other-game icon loads', await p.evaluate(() => Promise.all([...document.querySelectorAll('#more-list img')].map(i => i.decode().then(() => i.naturalWidth > 0, () => false))).then(a => a.length > 0 && a.every(Boolean))));
+  await p.click('#btn-more-back'); check('Back returns to the title', await p.isVisible('#screen-title') && await p.isHidden('#screen-more'));
+  check('More games is not reachable from the pause screen', (await p.locator('#screen-pause #btn-more, #app #btn-more').count()) === 0);
   // Game over with no towers
   await p.click('.mapbtn'); await p.evaluate(() => { const H = window.__ironhold; H.G.speed = 3; H.G.lives = 2; H.startWave(true); });
   await p.waitForFunction(() => !document.querySelector('#screen-end').hidden, null, { timeout: 60000 });

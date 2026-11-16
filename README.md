@@ -52,15 +52,15 @@ keyPassword=...
 
 ### 2. Build the app bundle
 
-**On GitHub:** Actions → *Release (Play bundle)* → Run workflow with version `1.1.0`. With the
-secrets set, it builds, checks and attaches `ironhold-1.1.0-play.aab` (versionCode 10100) to a
-release tagged `play-v1.1.0`.
+**On GitHub:** Actions → *Release (Play bundle)* → Run workflow with version `1.1.1`. With the
+secrets set, it builds, checks and attaches `ironhold-1.1.1-play.aab` (versionCode 10101) to a
+release tagged `play-v1.1.1`.
 
 **Or locally** (Android SDK with platform 36, JDK 17+):
 
 ```bash
 cd android
-./gradlew :play:bundleRelease :play:assembleRelease -PversionCode=10100 -PversionName=1.1.0
+./gradlew :play:bundleRelease :play:assembleRelease -PversionCode=10101 -PversionName=1.1.1
 node ../tools/check-apk.js play/build/outputs/apk/release/play-release.apk --package com.taugustincst.ironhold
 # upload play/build/outputs/bundle/release/play-release.aab
 ```
