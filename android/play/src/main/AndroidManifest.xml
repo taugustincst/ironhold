@@ -2,8 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Ironhold's Play edition: the whole game in the app's assets, played in
-         one full-screen WebView. No permission at all, not even INTERNET:
-         the game makes no network requests and sells nothing inside it.
+         one full-screen WebView. The app asks for no permission of its own;
+         the Play Billing library adds the ones it needs to sell the
+         full-game unlock. The game itself makes no network requests.
          There is deliberately no android:name on the application element. -->
     <application
         android:allowBackup="true"

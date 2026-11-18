@@ -56,6 +56,10 @@ canvas{display:block;image-rendering:auto;touch-action:none}
 .mapbtn .mt span{display:block;color:var(--muted);font-size:.78rem}
 .mapbtn .st{color:var(--gold);font-size:.95rem;letter-spacing:.05em;white-space:nowrap}
 .mapbtn.locked{opacity:.5}
+.mapbtn.paid .mt span{color:var(--gold)}
+.mapbtn .lock{font-size:1.1rem}
+.full-btn{border-color:var(--gold);color:var(--gold)}
+.card .note{margin:0;text-align:center;font-size:.85rem;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.5rem .6rem}
 .stars{text-align:center;font-size:2rem;color:var(--gold);letter-spacing:.15em}
 .help{margin:0;padding-left:1.1rem;color:var(--muted);font-size:.9rem;line-height:1.45}
 .help li{margin:.35rem 0}
