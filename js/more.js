@@ -19,14 +19,14 @@
     { id: 'mended', title: 'Mended: Repair Shop', hook: "Run your own repair shop. Diagnose, quote, order parts and win a street's trust.", tags: ['deduction', 'shop', 'cozy'], live: true },
     { id: 'keepthelight', title: 'Keep the Light', hook: 'An incremental that ends. One lighthouse, 1890 to 1990, a century in a logbook.', tags: ['incremental', 'story', 'cozy'], live: true },
     { id: 'openstall', title: 'Open Stall: Market Builder', hook: 'Lay out a market stall, find the combos, and buy the shop on the square.', tags: ['shop', 'builder', 'cozy'], live: true },
-    { id: 'cartographer', title: "Cartographer's Apprentice", hook: 'Not a quiz. A geography deduction game: evidence, atlas, expedition, career.', tags: ['deduction', 'educational'], live: false },
+    { id: 'cartographer', title: "Cartographer's Apprentice", hook: 'Not a quiz. A geography deduction game: evidence, atlas, expedition, career.', tags: ['deduction', 'educational'], live: true },
     { id: 'blackpool', title: 'The 9:15 to Blackpool', hook: 'Casebook deduction. Six closed cases, real evidence, confirmed in threes.', tags: ['deduction', 'mystery', 'story'], live: false },
     { id: 'nightbakery', title: 'Night Bakery', hook: 'Run a midnight bakery: bake, brew and serve the night owls before dawn.', tags: ['shop', 'cozy', 'story'], live: false },
     { id: 'harbormaster', title: 'Harbor Master', hook: 'Bring the ships in, turn them around, and beat the tide.', tags: ['strategy', 'builder'], live: false },
-    { id: 'seedandsprout', title: 'Seed & Sprout', hook: 'Grow, crossbreed and sell flowers. Chase the legendary Moon Orchid.', tags: ['cozy', 'builder'], live: false },
-    { id: 'nighttrain', title: 'The Night Train', hook: 'Steward a sleeper train north: berths, tea, and the Aurora Express.', tags: ['story', 'cozy', 'shop'], live: false },
+    { id: 'seedandsprout', title: 'Seed & Sprout', hook: 'Grow, crossbreed and sell flowers. Chase the legendary Moon Orchid.', tags: ['cozy', 'builder'], live: true },
+    { id: 'nighttrain', title: 'The Night Train', hook: 'Steward a sleeper train north: berths, tea, and the Aurora Express.', tags: ['story', 'cozy', 'shop'], live: true },
     { id: 'clockworkpost', title: 'Clockwork Post', hook: 'Set the gears, route the parcels, beat the whistle.', tags: ['puzzle'], live: false },
-    { id: 'pocketdecks', title: 'Pocket Decks', hook: 'Make your own beats, mix live on two decks, climb to the Main Stage.', tags: ['music'], live: false }
+    { id: 'pocketdecks', title: 'Pocket Decks', hook: 'Make your own beats, mix live on two decks, climb to the Main Stage.', tags: ['music'], live: true }
   ];
 
   function url(t) { return PLAY + t.id; }
