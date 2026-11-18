@@ -4,23 +4,29 @@
    never inside play, which is what keeps the "Contains ads" answer at No.
 
    A title shows only while `live` is true. Turn it on once its listing is
-   public, or the link opens Play's "not found" page. Elderon is live but
-   stays off until its icon is in icons/more/. The 16+ Night Shift is left
-   out on purpose, because these games are rated for younger players.
-   Same file in every game. */
+   public, or the link opens Play's "not found" page. The 16+ Night Shift is
+   left out on purpose, because these games are rated for younger players,
+   and so is Bubble Pop for Kids, whose Families listing needs a parental
+   gate before any link out. Same file in every game. */
 (function (root) {
   'use strict';
   var PLAY = 'https://play.google.com/store/apps/details?id=com.taugustincst.';
   var CATALOG = [
-    { id: 'elderon', title: 'Elderon', hook: 'Tactical RPG: tempo turns, jobs, height and facing. Offline, no ads.', tags: ['strategy', 'rpg'], live: false },
-    { id: 'ironhold', title: 'Ironhold Tower Defense', hook: 'Offline tower defense: 120 waves, 3 maps, 5 towers, bosses. No ads, no IAP.', tags: ['strategy'], live: true },
+    { id: 'elderon', title: 'Elderon', hook: 'Tactical RPG: tempo turns, jobs, height and facing. Offline, no ads.', tags: ['strategy', 'rpg'], live: true },
+    { id: 'ironhold', title: 'Ironhold Tower Defense', hook: 'Offline tower defense: 120 waves, 3 maps, 5 towers, bosses. No ads.', tags: ['strategy'], live: true },
     { id: 'lostproperty', title: 'Lost Property Office', hook: 'Every lost thing has a story. Check claims against the log and stamp.', tags: ['deduction', 'story', 'cozy'], live: true },
     { id: 'apothecary', title: 'The Night Apothecary', hook: 'Diagnose by description. A deduction shop game: 30 nights, 40 herbs, 3 endings.', tags: ['deduction', 'shop', 'story', 'cozy'], live: true },
     { id: 'mended', title: 'Mended: Repair Shop', hook: "Run your own repair shop. Diagnose, quote, order parts and win a street's trust.", tags: ['deduction', 'shop', 'cozy'], live: true },
     { id: 'keepthelight', title: 'Keep the Light', hook: 'An incremental that ends. One lighthouse, 1890 to 1990, a century in a logbook.', tags: ['incremental', 'story', 'cozy'], live: true },
-    { id: 'openstall', title: 'Open Stall: Market Builder', hook: 'Lay out a market stall, find the combos, pay the fee, buy the shop on the square.', tags: ['shop', 'builder', 'cozy'], live: false },
-    { id: 'cartographer', title: "Cartographer's Apprentice", hook: 'Not a quiz. A geography deduction game: evidence, atlas, expedition, career.', tags: ['deduction', 'educational'], live: false },
-    { id: 'blackpool', title: 'The 9:15 to Blackpool', hook: 'Casebook deduction. Six closed cases, real evidence, confirmed in threes.', tags: ['deduction', 'mystery', 'story'], live: false }
+    { id: 'openstall', title: 'Open Stall: Market Builder', hook: 'Lay out a market stall, find the combos, and buy the shop on the square.', tags: ['shop', 'builder', 'cozy'], live: true },
+    { id: 'cartographer', title: "Cartographer's Apprentice", hook: 'Not a quiz. A geography deduction game: evidence, atlas, expedition, career.', tags: ['deduction', 'educational'], live: true },
+    { id: 'blackpool', title: 'The 9:15 to Blackpool', hook: 'Casebook deduction. Six closed cases, real evidence, confirmed in threes.', tags: ['deduction', 'mystery', 'story'], live: false },
+    { id: 'nightbakery', title: 'Night Bakery', hook: 'Run a midnight bakery: bake, brew and serve the night owls before dawn.', tags: ['shop', 'cozy', 'story'], live: false },
+    { id: 'harbormaster', title: 'Harbor Master', hook: 'Bring the ships in, turn them around, and beat the tide.', tags: ['strategy', 'builder'], live: false },
+    { id: 'seedandsprout', title: 'Seed & Sprout', hook: 'Grow, crossbreed and sell flowers. Chase the legendary Moon Orchid.', tags: ['cozy', 'builder'], live: true },
+    { id: 'nighttrain', title: 'The Night Train', hook: 'Steward a sleeper train north: berths, tea, and the Aurora Express.', tags: ['story', 'cozy', 'shop'], live: true },
+    { id: 'clockworkpost', title: 'Clockwork Post', hook: 'Set the gears, route the parcels, beat the whistle.', tags: ['puzzle'], live: false },
+    { id: 'pocketdecks', title: 'Pocket Decks', hook: 'Make your own beats, mix live on two decks, climb to the Main Stage.', tags: ['music'], live: true }
   ];
 
   function url(t) { return PLAY + t.id; }
