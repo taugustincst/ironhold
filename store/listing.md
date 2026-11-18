@@ -5,11 +5,11 @@
 **App name** (30 chars max): `Ironhold Tower Defense` (22 chars)
 
 **Short description** (80 chars max, 75 chars):
-`Offline tower defense: 120 waves, 3 maps, 5 towers, bosses. No ads, no IAP.`
+`Offline tower defense: 120 waves, 3 maps, 5 towers, bosses. No ads.`
 
 **Full description**:
 
-Ironhold is a complete tower defense game: place towers along the road, upgrade them as the waves grow stronger, and don't let anything reach the gate. No ads interrupt a run, nothing is sold inside the game, and your progress never leaves your device.
+Ironhold is a complete tower defense game: place towers along the road, upgrade them as the waves grow stronger, and don't let anything reach the gate. No ads interrupt a run, and your progress never leaves your device.
 
 The road is open, the horde is coming, and the hold is yours to defend.
 
