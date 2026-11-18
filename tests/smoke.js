@@ -21,7 +21,7 @@ const check = (name, ok, extra = '') => { console.log((ok ? 'PASS ' : 'FAIL ') +
   check('Frostvale and Ashlands show as part of the full game', (await p.locator('.mapbtn.paid').count()) === 2 && (await p.locator('.mapbtn:not(.paid)').count()) === 1);
   check('the title offers the full game', await p.isVisible('#btn-full'));
   await p.locator('.mapbtn').nth(1).click(); await p.waitForTimeout(100);
-  check('tapping a locked map opens the unlock screen, not the map', await p.isVisible('#screen-unlock') && await p.isHidden('#app'));
+  check('tapping a locked map opens the unlock screen, not the map', await p.isVisible('#screen-unlock') && await p.evaluate(() => window.__ironhold.G === null));
   check('outside the Play app there is no buy button, and the page says where to unlock', await p.isHidden('#u-buy') && /Google Play edition/.test(await p.textContent('#u-note')));
   check('no price is written into the game', !/[$£€]\s?\d/.test(await p.textContent('#screen-unlock')));
   await p.click('#u-back'); check('Not now returns to the title', await p.isVisible('#screen-title'));
