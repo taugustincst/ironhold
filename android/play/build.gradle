@@ -2,13 +2,15 @@ plugins {
     id 'com.android.application'
 }
 
-// The Google Play edition of Ironhold: a paid download with the whole game
-// inside it. A single full-screen WebView plays the game from the app's own
+// The Google Play edition of Ironhold: free to download, with Greenfield Pass
+// free and the rest of the game (Frostvale Fork, Ashlands Gauntlet, Endless
+// mode) behind one in-app purchase, the full_unlock product. A single full-screen WebView plays the game from the app's own
 // assets: WebViewAssetLoader serves assets/www over a synthetic https origin
 // (appassets.androidplatform.net), so localStorage keeps progress between
-// launches like it would on a secure site. The app asks for no permission,
-// not even INTERNET: the game makes no network requests, there is no
-// purchase inside it, and the website no longer hosts the playable game.
+// launches like it would on a secure site. The app asks for no permission of
+// its own; the Play Billing library adds the ones it needs to sell the
+// unlock. The game makes no network requests, and the website no longer
+// hosts the playable game.
 //
 // The same shape as Bubble Pop's Play edition. tools/check-apk.js checks
 // every APK built here, and the Android workflow opens it on an emulator and
@@ -26,8 +28,8 @@ if (keystoreFile.exists()) {
 
 // Every Play upload needs a higher versionCode than any earlier one. The
 // release workflow derives it from the version (1.0.0 -> 10000).
-def relVersionCode = (project.hasProperty('versionCode') ? project.property('versionCode') : '10101').toString().toInteger()
-def relVersionName = (project.hasProperty('versionName') ? project.property('versionName') : '1.1.1').toString()
+def relVersionCode = (project.hasProperty('versionCode') ? project.property('versionCode') : '10200').toString().toInteger()
+def relVersionName = (project.hasProperty('versionName') ? project.property('versionName') : '1.2.0').toString()
 
 // The game's files live at the repository root. They are copied into the
 // app's assets as assets/www/... at build time, so the app can never drift
@@ -97,4 +99,11 @@ dependencies {
     // WindowCompat and WindowInsetsControllerCompat: full screen on every
     // Android the app supports (the platform's own controller is API 30+).
     implementation 'androidx.core:core:1.16.0'
+    // Google Play Billing for the one-time full-game unlock. Play requires a
+    // recent major version for new apps; raise it when Play asks.
+    implementation 'com.android.billingclient:billing:8.0.0'
+    // Billing brings kotlin-stdlib 1.8; the BOM lifts the older stdlib-jdk7/jdk8
+    // that other libraries pull in to the same version, or the build fails on
+    // duplicate classes.
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22')
 }

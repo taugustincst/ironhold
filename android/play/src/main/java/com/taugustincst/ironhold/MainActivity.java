@@ -23,6 +23,10 @@ import androidx.webkit.WebViewAssetLoader;
 /**
  * Ironhold: one full-screen WebView playing the game from the app's assets.
  *
+ * <p>Greenfield Pass is free; Frostvale Fork, Ashlands Gauntlet and Endless
+ * mode are a one-time purchase through Google Play (PlayBilling), offered by
+ * the game.
+ *
  * <p>WebViewAssetLoader serves assets/www over a synthetic https origin, so
  * the page behaves as it would on a secure site (localStorage keeps the
  * player's progress between launches) without any network access.
@@ -39,6 +43,7 @@ public class MainActivity extends Activity {
     private static final String START_URL = "https://" + HOST + "/www/index.html";
 
     private WebView webView;
+    private PlayBilling billing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +136,12 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
 
+        // The full-game unlock: js/billing.js calls this as window.AndroidBilling.
+        // Only the game's own pages ever load in this WebView (see
+        // shouldOverrideUrlLoading), so only they can reach it.
+        billing = new PlayBilling(this, webView);
+        webView.addJavascriptInterface(billing, "AndroidBilling");
+
         setContentView(webView);
         enterFullScreen();
         if (savedInstanceState != null) {
@@ -193,6 +204,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (billing != null) {
+            billing.destroy();
+            billing = null;
+        }
         if (webView != null) {
             webView.destroy();
             webView = null;

@@ -152,9 +152,36 @@ const Sfx = {
   },
 };
 
+/* ================= FULL GAME UNLOCK ================= */
+// Greenfield Pass (all 40 waves) is free. One purchase through Google Play, the full_unlock product,
+// opens Frostvale Fork, Ashlands Gauntlet and Endless mode. Players of the paid download keep it all.
+const BILL = window.createBilling({ storageKey: 'ironhold.unlock', productId: 'full_unlock' });
+function owned() { return BILL.state.owned || profile.legacy === true; }
+let unlockFrom = null;
+function unlockMsg() {
+  const b = BILL.state;
+  if (owned()) return 'The full game is yours. Thank you for supporting Ironhold.';
+  if (!b.available) return 'The full game is unlocked in the Google Play edition of Ironhold.';
+  if (b.pending) return 'Your purchase is waiting on Google Play. The maps open as soon as it goes through.';
+  if (b.error) return b.error;
+  return '';
+}
+function renderUnlock() {
+  const b = BILL.state, msg = unlockMsg();
+  $('#u-note').textContent = msg; $('#u-note').hidden = !msg;
+  const buy = $('#u-buy');
+  buy.hidden = owned() || !b.available;
+  buy.disabled = b.busy || b.pending;
+  buy.textContent = b.busy ? 'Opening Google Play…' : b.price ? `Unlock the full game · ${b.price}` : 'Unlock the full game';
+  $('#u-restore').hidden = owned() || !b.available;
+  $('#u-back').textContent = owned() ? 'Play' : 'Not now';
+}
+function showUnlock(from) { unlockFrom = from; renderUnlock(); showScreen('unlock'); }
+function leaveUnlock() { const from = unlockFrom; unlockFrom = null; if (from === 'endless' && G && G.won) showScreen('end'); else showScreen('title'); }
+
 /* ================= SAVE ================= */
 const SAVE_KEY = 'ironhold.v1';
-let profile = { v: 2, best: {}, sound: true, run: null, seenHelp: false };
+let profile = { v: 3, best: {}, sound: true, run: null, seenHelp: false, legacy: false };
 function saneNum(v, lo, hi, dflt) { const n = Number(v); return Number.isFinite(n) ? Math.round(clamp(n, lo, hi)) : dflt; }
 function sanitizeBest(best) {
   const out = {};
@@ -184,11 +211,15 @@ function sanitizeRun(run) {
 function loadProfile() {
   try {
     const p = JSON.parse(localStorage.getItem(SAVE_KEY));
-    if (p && typeof p === 'object') profile = { v: 2, best: sanitizeBest(p.best), sound: typeof p.sound === 'boolean' ? p.sound : true, run: sanitizeRun(p.run), seenHelp: p.seenHelp === true };
+    // A save written before 1.2.0 (v2) came from the paid download, when every map was included:
+    // that player keeps the full game. v3 saves carry the flag forward.
+    if (p && typeof p === 'object') profile = { v: 3, best: sanitizeBest(p.best), sound: typeof p.sound === 'boolean' ? p.sound : true, run: sanitizeRun(p.run), seenHelp: p.seenHelp === true,
+      legacy: p.v === 2 || p.legacy === true };
   } catch (e) { }
+  if (profile.run && profile.run.mapIdx > 0 && !owned()) profile.run = null;
   Sfx.on = profile.sound !== false;
 }
-function saveProfile() { try { profile.v = 2; localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch (e) { } }
+function saveProfile() { try { profile.v = 3; localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch (e) { } }
 
 /* ================= GAME STATE ================= */
 const canvas = $('#c'), ctx = canvas.getContext('2d');
@@ -439,6 +470,7 @@ function gameOver(won) {
     $('#end-text').textContent = won ? `You held ${G.map.name} for all ${G.map.waves} waves with ${G.lives} lives left. ${G.kills} enemies slain.`
       : `You reached wave ${G.wave} on ${G.map.name} and slew ${G.kills} enemies. Best: wave ${b.wave}.`;
     $('#btn-endless').hidden = !won;
+    $('#btn-endless').textContent = owned() ? 'Continue (Endless)' : 'Endless mode (full game)';
     showScreen('end');
   }, won ? 900 : 1200);
 }
@@ -658,10 +690,15 @@ $('#btn-restart').addEventListener('click', () => { clearRun(); newGame(G.mapIdx
 $('#btn-quit').addEventListener('click', () => { if (G.phase !== 'wave') saveRun(); goTitle(); });
 $('#btn-retry').addEventListener('click', () => { newGame(G.mapIdx); showScreen('game'); });
 $('#btn-end-menu').addEventListener('click', () => goTitle());
-$('#btn-endless').addEventListener('click', () => { G.endless = true; G.phase = 'countdown'; G.countdown = 18; G.won = false; saveRun(); showScreen('game'); toast('Endless mode: how far can you go?'); });
-$('#btn-continue').addEventListener('click', () => { const r = profile.run; if (!r || !MAP_DEFS[r.mapIdx]) return; Sfx.init(); newGame(r.mapIdx, r); enterGame(); });
+$('#btn-endless').addEventListener('click', () => { if (!owned()) { showUnlock('endless'); return; } G.endless = true; G.phase = 'countdown'; G.countdown = 18; G.won = false; saveRun(); showScreen('game'); toast('Endless mode: how far can you go?'); });
+$('#btn-continue').addEventListener('click', () => { const r = profile.run; if (!r || !MAP_DEFS[r.mapIdx]) return; if (r.mapIdx > 0 && !owned()) { showUnlock('map'); return; } Sfx.init(); newGame(r.mapIdx, r); enterGame(); });
 $('#btn-howto').addEventListener('click', () => showScreen('howto'));
 $('#btn-howto-back').addEventListener('click', () => showScreen('title'));
+$('#btn-full').addEventListener('click', () => { Sfx.init(); showUnlock('title'); });
+$('#u-buy').addEventListener('click', () => { BILL.buy(); renderUnlock(); });
+$('#u-restore').addEventListener('click', () => { BILL.restore(); renderUnlock(); });
+$('#u-back').addEventListener('click', leaveUnlock);
+BILL.onChange(() => { if (screen === 'unlock') renderUnlock(); if (screen === 'title') renderTitle(); if (owned() && screen === 'end') $('#btn-endless').textContent = 'Continue (Endless)'; });
 // More from AugustInnovations: reached from the title screen only, never during a run.
 $('#btn-more').hidden = !(window.MoreGames && window.MoreGames.render($('#more-list'), 'ironhold'));
 $('#btn-more').addEventListener('click', () => showScreen('more'));
@@ -690,17 +727,20 @@ function renderTitle() {
   MAP_DEFS.forEach((m, i) => {
     const b = profile.best[m.id] || { wave: 0, stars: 0 };
     const prev = i === 0 ? null : (profile.best[MAP_DEFS[i - 1].id] || { wave: 0 });
-    const locked = prev && prev.wave < 15;
-    const btn = document.createElement('button'); btn.className = 'mapbtn' + (locked ? ' locked' : '');
+    const paid = i > 0 && !owned();
+    const locked = !paid && prev && prev.wave < 15;
+    const btn = document.createElement('button'); btn.className = 'mapbtn' + (locked ? ' locked' : '') + (paid ? ' paid' : '');
     const th = mapThumb(m);
-    btn.innerHTML = `<img class="thumb" alt="" src="${th}"><span class="mt"><b>${m.name}</b><span>${locked ? 'Reach wave 15 on ' + MAP_DEFS[i - 1].name + ' to unlock' : m.desc}</span>${b.wave ? `<span>Best: wave ${b.wave}${b.won ? ' · Conquered' : ''}</span>` : ''}</span><span class="st">${b.won ? '★'.repeat(b.stars) + '☆'.repeat(3 - b.stars) : ''}</span>`;
+    const line = paid ? 'Part of the full game' : locked ? 'Reach wave 15 on ' + MAP_DEFS[i - 1].name + ' to unlock' : m.desc;
+    btn.innerHTML = `<img class="thumb" alt="" src="${th}"><span class="mt"><b>${m.name}</b><span>${line}</span>${b.wave && !paid ? `<span>Best: wave ${b.wave}${b.won ? ' · Conquered' : ''}</span>` : ''}</span><span class="st">${paid ? '<span class="lock" aria-label="Locked">🔒</span>' : b.won ? '★'.repeat(b.stars) + '☆'.repeat(3 - b.stars) : ''}</span>`;
     btn.disabled = locked;
-    btn.addEventListener('click', () => { Sfx.init(); clearRun(); newGame(i); enterGame(); });
+    btn.addEventListener('click', () => { if (paid) { Sfx.init(); showUnlock('map'); return; } Sfx.init(); clearRun(); newGame(i); enterGame(); });
     list.appendChild(btn);
   });
   const r = profile.run; const cb = $('#btn-continue');
   cb.hidden = !(r && MAP_DEFS[r.mapIdx]);
   if (!cb.hidden) cb.textContent = `Continue ${MAP_DEFS[r.mapIdx].name} · wave ${r.wave + 1}`;
+  const ub = $('#btn-full'); ub.hidden = owned(); 
   $('#btn-sound').textContent = 'Sound: ' + (Sfx.on ? 'On' : 'Off');
 }
 const thumbCache = {};
@@ -716,7 +756,9 @@ function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = fal
 
 /* ================= BOOT ================= */
 loadProfile();
+saveProfile();
+BILL.start();
 showScreen('title');
 lastT = performance.now(); raf = requestAnimationFrame(tick);
 if ('serviceWorker' in navigator && location.protocol === 'https:') { window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => { })); }
-window.__ironhold = { get G() { return G; }, newGame, startWave, buyTower, addTower, MAP_DEFS, TOWER_DEFS, ENEMY_DEFS, buildWave, enterGame, showScreen };
+window.__ironhold = { get G() { return G; }, get profile() { return profile; }, owned, billing: BILL, newGame, startWave, buyTower, addTower, MAP_DEFS, TOWER_DEFS, ENEMY_DEFS, buildWave, enterGame, showScreen };

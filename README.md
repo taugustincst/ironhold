@@ -1,7 +1,7 @@
 # Ironhold Tower Defense
 
-A complete, self-contained HTML5 tower defense game, sold on Google Play as a paid app with the
-whole game inside it. The website (https://taugustincst.github.io/ironhold/) is its store page;
+A complete, self-contained HTML5 tower defense game, free on Google Play with one in-app
+purchase for the full game (see `PLAY.md`). The website (https://taugustincst.github.io/ironhold/) is its store page;
 once the store-page change is merged it no longer serves the playable game.
 
 ## Game
@@ -90,7 +90,7 @@ The app no longer opens the website, so `assetlinks.json` needs no entry for it.
 - **Ads**: declare "No ads".
 - **Store assets**: 512×512 icon (`icons/icon-512.png`), 1024×500 feature graphic, and at least 2 phone screenshots (in `store/`).
 - **Target API level**: `android/play/build.gradle` targets API 36; raise `compileSdk`/`targetSdk` when Play's yearly requirement moves.
-- **Pricing**: set the app as paid at upload time if you want to charge up front. A Play app cannot change from free to paid later, so decide before publishing.
+- **Pricing**: free, with the `full_unlock` in-app product (see `PLAY.md`). A Play app can go from paid to free once and never back.
 
 ### 5. Releasing updates
 

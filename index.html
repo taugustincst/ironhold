@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#121a24">
-<meta name="description" content="Ironhold: a fast, strategic tower defense game. Build towers, hold the line, survive 40 waves across three maps.">
+<meta name="description" content="Ironhold: a fast, strategic tower defense game. Build towers, hold the line, survive 40 waves. Greenfield Pass is free; one purchase opens two more maps and Endless mode.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -39,6 +39,7 @@
     <p class="sub">Tower Defense</p>
     <div id="map-list"></div>
     <button id="btn-continue" class="big accent" hidden>Continue run</button>
+    <button id="btn-full" class="big full-btn" hidden>Get the full game</button>
     <div class="row">
       <button id="btn-sound" class="hbtn wide">Sound: On</button>
       <button id="btn-howto" class="hbtn wide">How to play</button>
@@ -72,6 +73,22 @@
   </div>
 </section>
 
+<section class="screen" id="screen-unlock" hidden>
+  <div class="card">
+    <h2>The full Ironhold</h2>
+    <p class="fine">Greenfield Pass is free, all 40 waves of it. One purchase through Google Play opens the rest, for good.</p>
+    <ul class="help">
+      <li><b>Frostvale Fork:</b> two roads converge, 40 waves.</li>
+      <li><b>Ashlands Gauntlet:</b> the long, brutal march, 40 waves.</li>
+      <li><b>Endless mode:</b> keep going after any map you conquer.</li>
+    </ul>
+    <p class="note" id="u-note" hidden></p>
+    <button id="u-buy" class="big accent" hidden>Unlock the full game</button>
+    <button id="u-restore" class="hbtn wide" hidden>Restore purchase</button>
+    <button id="u-back" class="big">Not now</button>
+  </div>
+</section>
+
 <section class="screen" id="screen-pause" hidden>
   <div class="card">
     <h2>Paused</h2>
@@ -94,6 +111,7 @@
 
 <div id="toast" hidden></div>
 
+<script src="js/billing.js"></script>
 <script src="js/more.js"></script>
 <script src="game.js"></script>
 </body>
